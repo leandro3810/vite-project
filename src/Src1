@@ -1,0 +1,6 @@
+src/
+  components/
+    Header.jsx
+    Footer.jsx
+  App.jsx
+  main.jsx
