@@ -1,11 +1,7 @@
 import React from 'react';
+import { minhaFuncao } from './utils/minhaFuncao';
 
 function App() {
-  // Função criada dentro do componente
-  const minhaFuncao = () => {
-    alert('Olá do React!');
-  };
-
   return (
     <div>
       <h1>Projeto com Vite + React</h1>
