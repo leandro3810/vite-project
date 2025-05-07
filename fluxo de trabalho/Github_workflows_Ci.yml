@@ -1,5 +1,4 @@
-name: CI Workflow
-
+name: React CI Workflow
 on:
   push:
     branches:
