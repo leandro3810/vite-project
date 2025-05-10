@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "vite build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   }
 }
