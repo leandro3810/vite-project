@@ -1,0 +1,15 @@
+{
+  "incluir" :["fonte","roteiros"],
+  "opções do compilador":{
+    "outDir":"distância",
+    "alvo":"ES2020",
+   " módulo":"ES2020",
+    "móduloResolução":"empacotador",
+    "estrito":verdadeiro,
+    "declaração":verdadeiro,
+    "sourceMap":verdadeiro,
+    "não emitir":verdadeiro,
+    "noUnusedlocals":verdadeiro,
+    "esModuleInterop":verdadeiro
+  }
+}
