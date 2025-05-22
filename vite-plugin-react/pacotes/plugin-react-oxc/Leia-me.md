@@ -71,9 +71,9 @@ app.get('/', async (req, res, next) => {
 
 Otherwise, you'll probably get this error:
 
-```
+``
 Uncaught Error: @vitejs/plugin-react-oxc can't detect preamble. Something is wrong.
-```
+``
 
 ## Consistent components exports
 
