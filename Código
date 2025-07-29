@@ -1,0 +1,13 @@
+Vite-project/
+├── public/
+│   └── index.html
+├── src/
+│   ├── components/
+│   │   └── HelloWorld.jsx
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── .gitignore
+├── package.json
+├── README.md
+└── vite.config.js
