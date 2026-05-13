@@ -2,7 +2,17 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from './App'
 
-describe('src/App (Vite starter counter)', () => {
+describe('App', () => {
+  it('renders the header', () => {
+    render(<App />)
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+  })
+
+  it('renders the footer', () => {
+    render(<App />)
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument()
+  })
+
   it('renders the Vite + React heading', () => {
     render(<App />)
     expect(screen.getByText('Vite + React')).toBeInTheDocument()
@@ -29,15 +39,18 @@ describe('src/App (Vite starter counter)', () => {
     expect(button).toHaveTextContent('count is 3')
   })
 
-  it('renders the HMR hint text', () => {
+  it('shows the soma result', () => {
     render(<App />)
-    expect(screen.getByText(/Edit/)).toBeInTheDocument()
+    expect(screen.getByText(/Soma de 10 \+ 5: 15/)).toBeInTheDocument()
   })
 
-  it('renders the read-the-docs link prompt', () => {
+  it('shows the multiplicacao result', () => {
     render(<App />)
-    expect(
-      screen.getByText('Click on the Vite and React logos to learn more')
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Multiplicação de 10 × 5: 50/)).toBeInTheDocument()
+  })
+
+  it('shows the formatted currency', () => {
+    render(<App />)
+    expect(screen.getByText(/Moeda Formatada: R\$ 1234,56/)).toBeInTheDocument()
   })
 })
