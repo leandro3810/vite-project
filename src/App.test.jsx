@@ -3,54 +3,59 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import App from './App'
 
 describe('App', () => {
-  it('renders the header', () => {
+  it('renders header and navigation links', () => {
     render(<App />)
     expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Sobre' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Galeria' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Contato' })).toBeInTheDocument()
+    expect(screen.getByText('Atualização da minha página')).toBeInTheDocument()
   })
 
-  it('renders the footer', () => {
+  it('renders image gallery and footer', () => {
     render(<App />)
+    expect(screen.getByAltText('Logotipo do Vite')).toBeInTheDocument()
+    expect(screen.getByAltText('Logotipo do React')).toBeInTheDocument()
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 
-  it('renders the Vite + React heading', () => {
+  it('toggles the update details text when button is clicked', () => {
     render(<App />)
-    expect(screen.getByText('Vite + React')).toBeInTheDocument()
+    const toggleButton = screen.getByRole('button', {
+      name: 'Ver detalhes da atualização',
+    })
+
+    fireEvent.click(toggleButton)
+    expect(
+      screen.getByText(
+        /Ajustamos textos, imagens, espaçamentos e responsividade/
+      )
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ocultar detalhes' }))
+    expect(
+      screen.queryByText(
+        /Ajustamos textos, imagens, espaçamentos e responsividade/
+      )
+    ).not.toBeInTheDocument()
   })
 
-  it('renders a button with the initial count of 0', () => {
+  it('submits the contact form and displays success feedback', () => {
     render(<App />)
-    expect(screen.getByRole('button')).toHaveTextContent('count is 0')
-  })
 
-  it('increments the count on button click', () => {
-    render(<App />)
-    const button = screen.getByRole('button')
-    fireEvent.click(button)
-    expect(button).toHaveTextContent('count is 1')
-  })
+    fireEvent.change(screen.getByLabelText('Nome'), {
+      target: { value: 'Leandro' },
+    })
+    fireEvent.change(screen.getByLabelText('E-mail'), {
+      target: { value: 'leandro@example.com' },
+    })
+    fireEvent.change(screen.getByLabelText('Mensagem'), {
+      target: { value: 'Gostei da atualização da página.' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar formulário' }))
 
-  it('increments the count multiple times', () => {
-    render(<App />)
-    const button = screen.getByRole('button')
-    fireEvent.click(button)
-    fireEvent.click(button)
-    fireEvent.click(button)
-    expect(button).toHaveTextContent('count is 3')
-  })
-
-  it('shows the soma result', () => {
-    render(<App />)
-    expect(screen.getByText(/Soma de 10 \+ 5: 15/)).toBeInTheDocument()
-  })
-
-  it('shows the multiplicacao result', () => {
-    render(<App />)
-    expect(screen.getByText(/Multiplicação de 10 × 5: 50/)).toBeInTheDocument()
-  })
-
-  it('shows the formatted currency', () => {
-    render(<App />)
-    expect(screen.getByText(/Moeda Formatada: R\$ 1234,56/)).toBeInTheDocument()
+    expect(
+      screen.getByText('Mensagem enviada com sucesso, Leandro!')
+    ).toBeInTheDocument()
   })
 })
