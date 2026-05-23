@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "build": "vite build && vite build --ssr src/entry-server.jsx",
+    "build": "npm run build:client && npm run build:server",
     "build:client": "vite build",
     "build:server": "vite build --ssr src/entry-server.jsx",
     "preview": "vite preview",

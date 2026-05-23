@@ -24,6 +24,10 @@ async function createServer() {
 
   /** @type {import('vite').ViteDevServer | undefined} */
   let vite
+  /** @type {((url: string) => { html: string; head: string }) | undefined} */
+  let render
+  /** @type {string | undefined} */
+  let prodTemplate
 
   if (!isProd) {
     const { createServer: createViteServer } = await import('vite')
@@ -38,6 +42,11 @@ async function createServer() {
     const sirv = (await import('sirv')).default
     app.use(compression())
     app.use(base, sirv(path.resolve(__dirname, 'dist/client'), { extensions: [] }))
+    prodTemplate = fs.readFileSync(
+      path.resolve(__dirname, 'dist/client/index.html'),
+      'utf-8',
+    )
+    render = (await import('./dist/server/entry-server.js')).render
   }
 
   app.use('*', async (req, res) => {
@@ -45,22 +54,18 @@ async function createServer() {
       const url = req.originalUrl.replace(base, '')
 
       let template
-      let render
+      let resolvedRender
 
       if (!isProd) {
         template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8')
         template = await vite.transformIndexHtml(url, template)
-        render = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
+        resolvedRender = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
       } else {
-        template = fs.readFileSync(
-          path.resolve(__dirname, 'dist/client/index.html'),
-          'utf-8',
-        )
-        const entryServer = await import('./dist/server/entry-server.js')
-        render = entryServer.render
+        template = prodTemplate
+        resolvedRender = render
       }
 
-      const { html: appHtml, head: appHead } = render(url)
+      const { html: appHtml, head: appHead } = resolvedRender(url)
 
       const fullHtml = template
         .replace('<!--app-head-->', appHead ?? '')
@@ -70,6 +75,8 @@ async function createServer() {
     } catch (error) {
       if (vite) vite.ssrFixStacktrace(error)
       console.error(error.stack)
+      // In development, expose the stack trace to aid debugging.
+      // In production, return a generic message to avoid leaking internals.
       if (!isProd) {
         res.status(500).set({ 'Content-Type': 'text/plain' }).end(error.stack)
       } else {
