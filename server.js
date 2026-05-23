@@ -51,7 +51,10 @@ async function createServer() {
 
   app.use('*', async (req, res) => {
     try {
-      const url = req.originalUrl.replace(base, '')
+      let url = req.originalUrl
+      if (url.startsWith(base)) {
+        url = url.slice(base.length)
+      }
 
       let template
       let resolvedRender
