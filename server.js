@@ -78,13 +78,7 @@ async function createServer() {
     } catch (error) {
       if (vite) vite.ssrFixStacktrace(error)
       console.error(error.stack)
-      // In development, expose the stack trace to aid debugging.
-      // In production, return a generic message to avoid leaking internals.
-      if (!isProd) {
-        res.status(500).set({ 'Content-Type': 'text/plain' }).end(error.stack)
-      } else {
-        res.status(500).set({ 'Content-Type': 'text/plain' }).end('Internal Server Error')
-      }
+      res.status(500).set({ 'Content-Type': 'text/plain' }).end('Internal Server Error')
     }
   })
 
