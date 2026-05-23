@@ -1,10 +1,20 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from './App'
+import { PluginProvider } from './plugins/PluginContext'
+import { validationPlugin } from './plugins/examples/validationPlugin'
+
+function renderApp(plugins = []) {
+  return render(
+    <PluginProvider plugins={plugins}>
+      <App />
+    </PluginProvider>
+  )
+}
 
 describe('App', () => {
   it('renders header and navigation links', () => {
-    render(<App />)
+    renderApp()
     expect(screen.getByRole('banner')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Sobre' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Galeria' })).toBeInTheDocument()
@@ -13,14 +23,14 @@ describe('App', () => {
   })
 
   it('renders image gallery and footer', () => {
-    render(<App />)
+    renderApp()
     expect(screen.getByAltText('Logotipo do Vite')).toBeInTheDocument()
     expect(screen.getByAltText('Logotipo do React')).toBeInTheDocument()
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 
   it('toggles the update details text when button is clicked', () => {
-    render(<App />)
+    renderApp()
     const toggleButton = screen.getByRole('button', {
       name: 'Ver detalhes da atualização',
     })
@@ -41,7 +51,7 @@ describe('App', () => {
   })
 
   it('submits the contact form and displays success feedback', () => {
-    render(<App />)
+    renderApp()
 
     fireEvent.change(screen.getByLabelText('Nome'), {
       target: { value: 'Leandro' },
@@ -57,5 +67,28 @@ describe('App', () => {
     expect(
       screen.getByText('Mensagem enviada com sucesso, Leandro!')
     ).toBeInTheDocument()
+  })
+
+  it('displays validation error when a plugin rejects the form submission', () => {
+    renderApp([validationPlugin])
+
+    // single character — passes HTML5 `required` but fails the plugin's min-length check
+    fireEvent.change(screen.getByLabelText('Nome'), {
+      target: { value: 'A' },
+    })
+    fireEvent.change(screen.getByLabelText('E-mail'), {
+      target: { value: 'leandro@example.com' },
+    })
+    fireEvent.change(screen.getByLabelText('Mensagem'), {
+      target: { value: 'Mensagem de teste.' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar formulário' }))
+
+    expect(
+      screen.getByText(/O nome deve ter pelo menos 2 caracteres/)
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Mensagem enviada com sucesso/)
+    ).not.toBeInTheDocument()
   })
 })
