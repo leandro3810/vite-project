@@ -23,7 +23,9 @@ export class PluginManager {
    */
   register(plugin) {
     if (!plugin || typeof plugin.name !== 'string' || !plugin.name) {
-      throw new Error('O plugin deve ter uma propriedade "name" do tipo string.')
+      throw new Error(
+        'O plugin deve existir e ter uma propriedade "name" não vazia do tipo string.'
+      )
     }
     if (this._plugins.has(plugin.name)) {
       throw new Error(`Plugin "${plugin.name}" já está registrado.`)

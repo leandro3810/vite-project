@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from './App'
 import { PluginProvider } from './plugins/PluginContext'
+import { validationPlugin } from './plugins/examples/validationPlugin'
 
-function renderApp() {
+function renderApp(plugins = []) {
   return render(
-    <PluginProvider>
+    <PluginProvider plugins={plugins}>
       <App />
     </PluginProvider>
   )
@@ -66,5 +67,28 @@ describe('App', () => {
     expect(
       screen.getByText('Mensagem enviada com sucesso, Leandro!')
     ).toBeInTheDocument()
+  })
+
+  it('displays validation error when a plugin rejects the form submission', () => {
+    renderApp([validationPlugin])
+
+    // single character — passes HTML5 `required` but fails the plugin's min-length check
+    fireEvent.change(screen.getByLabelText('Nome'), {
+      target: { value: 'A' },
+    })
+    fireEvent.change(screen.getByLabelText('E-mail'), {
+      target: { value: 'leandro@example.com' },
+    })
+    fireEvent.change(screen.getByLabelText('Mensagem'), {
+      target: { value: 'Mensagem de teste.' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar formulário' }))
+
+    expect(
+      screen.getByText(/O nome deve ter pelo menos 2 caracteres/)
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Mensagem enviada com sucesso/)
+    ).not.toBeInTheDocument()
   })
 })

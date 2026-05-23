@@ -28,7 +28,7 @@ describe('PluginManager', () => {
 
     it('lança erro ao registrar plugin sem nome', () => {
       expect(() => manager.register({})).toThrow(
-        'O plugin deve ter uma propriedade "name"'
+        'O plugin deve existir e ter uma propriedade "name" não vazia do tipo string.'
       )
     })
 
