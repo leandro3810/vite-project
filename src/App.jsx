@@ -2,10 +2,13 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
+import { usePlugins } from './plugins/PluginContext'
 
 function App() {
+  const plugins = usePlugins()
   const [showDetails, setShowDetails] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,14 +22,25 @@ function App() {
 
   function handleSubmit(event) {
     event.preventDefault()
+    setErrorMessage('')
+
+    try {
+      plugins.executeHook('beforeFormSubmit', formData)
+    } catch (err) {
+      setErrorMessage(err.message)
+      return
+    }
+
     setStatusMessage(
       `Mensagem enviada com sucesso, ${formData.name || 'visitante'}!`
     )
+    const sent = { ...formData }
     setFormData({
       name: '',
       email: '',
       message: '',
     })
+    plugins.executeHook('afterFormSubmit', sent)
   }
 
   return (
@@ -113,6 +127,7 @@ function App() {
 
             <button type="submit">Enviar formulário</button>
           </form>
+          {errorMessage && <p className="error">{errorMessage}</p>}
           {statusMessage && <p className="status">{statusMessage}</p>}
         </section>
       </main>

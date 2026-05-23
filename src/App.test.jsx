@@ -1,10 +1,19 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from './App'
+import { PluginProvider } from './plugins/PluginContext'
+
+function renderApp() {
+  return render(
+    <PluginProvider>
+      <App />
+    </PluginProvider>
+  )
+}
 
 describe('App', () => {
   it('renders header and navigation links', () => {
-    render(<App />)
+    renderApp()
     expect(screen.getByRole('banner')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Sobre' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Galeria' })).toBeInTheDocument()
@@ -13,14 +22,14 @@ describe('App', () => {
   })
 
   it('renders image gallery and footer', () => {
-    render(<App />)
+    renderApp()
     expect(screen.getByAltText('Logotipo do Vite')).toBeInTheDocument()
     expect(screen.getByAltText('Logotipo do React')).toBeInTheDocument()
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 
   it('toggles the update details text when button is clicked', () => {
-    render(<App />)
+    renderApp()
     const toggleButton = screen.getByRole('button', {
       name: 'Ver detalhes da atualização',
     })
@@ -41,7 +50,7 @@ describe('App', () => {
   })
 
   it('submits the contact form and displays success feedback', () => {
-    render(<App />)
+    renderApp()
 
     fireEvent.change(screen.getByLabelText('Nome'), {
       target: { value: 'Leandro' },
