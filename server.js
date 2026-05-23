@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
+import { rateLimit } from 'express-rate-limit'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -9,8 +10,17 @@ const isProd = process.env.NODE_ENV === 'production'
 const port = process.env.PORT || 5173
 const base = process.env.BASE || '/vite-project/'
 
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
 async function createServer() {
   const app = express()
+
+  app.use(limiter)
 
   /** @type {import('vite').ViteDevServer | undefined} */
   let vite
@@ -60,12 +70,16 @@ async function createServer() {
     } catch (error) {
       if (vite) vite.ssrFixStacktrace(error)
       console.error(error.stack)
-      res.status(500).end(error.stack)
+      if (!isProd) {
+        res.status(500).set({ 'Content-Type': 'text/plain' }).end(error.stack)
+      } else {
+        res.status(500).set({ 'Content-Type': 'text/plain' }).end('Internal Server Error')
+      }
     }
   })
 
   app.listen(port, () => {
-    console.log(`Servidor SSR rodando em http://localhost:${port}`)
+    console.log(`SSR server running at http://localhost:${port}`)
   })
 }
 
