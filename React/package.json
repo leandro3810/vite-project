@@ -1,8 +1,0 @@
-{
-  "scripts": {
-    "build": "vite build",
-    "deploy": "gh-pages -d dist",
-    "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest"
-  }
-}
